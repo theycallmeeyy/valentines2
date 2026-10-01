@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7e7e5">
+  <meta name="description" content="A tiny Valentine adventure, made just for you.">
+  <title>Our Little Valentine Story</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap');
+
+    :root {
+      color-scheme: light;
+      --cream: #fffaf5;
+      --paper: #fffdf9;
+      --blush: #f7e7e5;
+      --pink: #df9da3;
+      --rose: #bf5969;
+      --berry: #852f42;
+      --ink: #422e31;
+      --muted: #8b7375;
+      --line: #ead8d4;
+      --serif: "Playfair Display", "Iowan Old Style", Georgia, serif;
+      --sans: "DM Sans", "Avenir Next", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100svh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      color: var(--ink);
+      background-color: var(--blush);
+      background-image:
+        radial-gradient(ellipse at 8% 15%, rgba(255,255,255,.88), transparent 28%),
+        radial-gradient(ellipse at 90% 82%, rgba(221,155,161,.36), transparent 33%),
+        repeating-linear-gradient(135deg, transparent 0 25px, rgba(133,47,66,.025) 26px 27px);
+      font-family: var(--sans);
+    }
+
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid #d98791; outline-offset: 4px; }
+    [hidden] { display: none !important; }
+
+    .shell {
+      position: relative;
+      width: min(100%, 1050px);
+      min-height: min(790px, calc(100svh - 44px));
+      padding: 23px clamp(22px, 5vw, 58px) 21px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 24px 75px rgba(100,44,52,.14), 0 2px 8px rgba(100,44,52,.06);
+      isolation: isolate;
+    }
+
+    .shell::before {
+      position: absolute;
+      z-index: -1;
+      inset: 12px;
+      border: 1px solid rgba(191,89,105,.16);
+      border-radius: 4px;
+      content: "";
+      pointer-events: none;
+    }
+
+    .topbar, .bottomline {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark { color: var(--rose); font-family: var(--serif); font-size: 21px; line-height: 1; }
+    .top-date { font-variant-numeric: lining-nums; }
+    .top-actions { display: flex; align-items: center; gap: clamp(8px, 2vw, 20px); }
+    .music-toggle { min-height: 34px; padding: 0; display: inline-flex; align-items: center; gap: 7px; border: 0; color: var(--rose); background: transparent; cursor: pointer; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .music-toggle svg { width: 15px; height: 15px; flex: 0 0 auto; }
+    .music-toggle:hover { color: var(--berry); }
+
+    .content { flex: 1; display: grid; place-items: center; padding: 24px 0; }
+    .proposal, .story-view { width: min(100%, 780px); text-align: center; animation: rise-in 600ms cubic-bezier(.2,.75,.25,1) both; }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--rose);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .23em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      margin: 0 auto;
+      color: var(--berry);
+      font-family: var(--serif);
+      font-weight: 500;
+      text-wrap: balance;
+    }
+
+    h1 { max-width: 690px; font-size: clamp(48px, 8vw, 83px); line-height: 1.02; }
+    h1 em { color: var(--rose); font-weight: 500; }
+    h2 { max-width: 700px; font-size: clamp(36px, 6vw, 61px); line-height: 1.08; }
+
+    .lede {
+      max-width: 440px;
+      margin: 16px auto 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .proposal-photo {
+      position: relative;
+      width: min(310px, 80%);
+      height: 180px;
+      margin: 28px auto 25px;
+      padding: 7px;
+      transform: rotate(-2deg);
+      background: white;
+      box-shadow: 0 9px 25px rgba(98,45,53,.14);
+    }
+
+    .proposal-photo img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 55%; }
+    .photo-caption { position: absolute; right: 11px; bottom: 10px; padding: 4px 8px; color: white; background: rgba(66,46,49,.55); font-family: var(--serif); font-size: 12px; font-style: italic; }
+
+    .answer-row { position: relative; min-height: 52px; display: flex; justify-content: center; align-items: center; gap: 14px; }
+
+    .button {
+      min-height: 48px;
+      padding: 0 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--rose);
+      border-radius: 3px;
+      color: white;
+      background: var(--rose);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: color 180ms ease, background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .button:hover { transform: translateY(-2px); color: var(--berry); background: transparent; box-shadow: 0 5px 15px rgba(133,47,66,.08); }
+    .button.primary { border-color: var(--berry); background: var(--berry); }
+    .button.primary:hover { color: white; background: #9b4053; box-shadow: 0 6px 18px rgba(133,47,66,.22); }
+    .button svg { width: 15px; height: 15px; }
+    .button-small { min-height: 42px; padding-inline: 17px; }
+    .button-quiet { border-color: var(--line); color: var(--muted); background: transparent; }
+    .button-quiet:hover { color: var(--berry); border-color: var(--rose); }
+
+    .no-button { min-width: 100px; color: var(--muted); border-color: var(--line); background: var(--paper); }
+    .no-button:hover { color: var(--muted); }
+    .tiny-hint { min-height: 20px; margin: 9px 0 0; color: var(--muted); font-family: var(--serif); font-size: 13px; font-style: italic; }
+
+    .progress-wrap { width: min(100%, 650px); margin: 0 auto 22px; }
+    .progress-meta { margin-bottom: 9px; display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .progress-track { height: 3px; overflow: hidden; background: #f0e4df; }
+    .progress-fill { width: 20%; height: 100%; background: var(--rose); transition: width 350ms ease; }
+
+    .story-view { max-width: 770px; }
+    .story-lede { max-width: 490px; margin: 13px auto 22px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+
+    .pick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; text-align: left; }
+
+    .pick {
+      min-width: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--ink);
+      background: white;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pick:hover { transform: translateY(-3px); border-color: var(--pink); box-shadow: 0 8px 19px rgba(133,47,66,.1); }
+    .pick[aria-pressed="true"] { border-color: var(--berry); box-shadow: 0 0 0 2px var(--berry); }
+    .pick-photo { width: 100%; aspect-ratio: 1.72; display: block; object-fit: cover; background: var(--blush); }
+    .pick-copy { min-height: 88px; padding: 12px 13px; display: block; }
+    .pick-title { display: block; color: var(--berry); font-family: var(--serif); font-size: 18px; line-height: 1.2; }
+    .pick-detail { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+
+    .date-plan {
+      width: min(100%, 650px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+      text-align: left;
+      background: #fbf2ed;
+    }
+
+    .plan-photo { min-height: 260px; width: 100%; height: 100%; display: block; object-fit: cover; }
+    .plan-copy { padding: clamp(20px, 4vw, 34px); align-self: center; }
+    .plan-kicker { margin: 0 0 9px; color: var(--rose); font-size: 10px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
+    .plan-copy h3 { margin: 0; color: var(--berry); font-family: var(--serif); font-size: 28px; font-weight: 500; line-height: 1.18; }
+    .plan-copy p { margin: 12px 0 0; color: var(--muted); font-size: 13px; line-height: 1.75; }
+    .plan-time { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--berry); font-family: var(--serif); font-size: 15px; font-style: italic; }
+
+    .summary-photo { width: min(100%, 460px); height: 195px; margin: 0 auto 18px; display: block; object-fit: cover; }
+    .summary-line { max-width: 520px; margin: 14px auto 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+    .summary-line strong { color: var(--berry); font-weight: 700; }
+    .music-button { margin: 18px auto 0; }
+    .music-note { min-height: 17px; margin: 9px 0 0; color: var(--muted); font-size: 11px; }
+
+    .story-controls { margin-top: 22px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .bottomline { margin-top: auto; padding: 9px 2px 0; font-size: 9px; }
+    .bottom-heart { color: var(--rose); font-family: var(--serif); font-size: 15px; }
+
+    .floating-heart { position: fixed; z-index: 3; top: var(--sy); left: var(--sx); color: var(--hc); font-size: var(--hs); line-height: 1; pointer-events: none; animation: float-up 1.4s ease-out forwards; }
+    .confetti { position: fixed; z-index: 4; top: -16px; left: var(--x); width: 8px; height: 11px; border-radius: 1px; background: var(--c); pointer-events: none; animation: confetti-fall var(--dur) cubic-bezier(.2,.6,.3,1) forwards; }
+
+    @keyframes rise-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes float-up { 0% { opacity: 0; transform: translate(-50%, 0) scale(.7); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(-50% + var(--drift)), -140px) rotate(var(--turn)) scale(1.1); } }
+    @keyframes confetti-fall { to { opacity: .1; transform: translateY(110vh) rotate(650deg); } }
+
+    @media (max-width: 650px) {
+      body { padding: 10px; }
+      .shell { min-height: calc(100svh - 20px); padding: 17px 22px 16px; }
+      .shell::before { inset: 9px; }
+      .topbar { font-size: 9px; letter-spacing: .12em; }
+      .content { padding: 23px 0; }
+      .proposal, .story-view { width: min(100%, 500px); }
+      h1 { font-size: clamp(48px, 13vw, 68px); }
+      h2 { font-size: clamp(38px, 10vw, 54px); }
+      .proposal-photo { height: 160px; margin-block: 22px; }
+      .progress-wrap { margin-bottom: 20px; }
+      .pick-grid { gap: 8px; }
+      .pick-copy { min-height: 90px; padding: 10px 9px; }
+      .pick-title { font-size: 16px; }
+      .pick-detail { font-size: 10px; }
+      .date-plan { grid-template-columns: 1fr; }
+      .plan-photo { min-height: 160px; max-height: 190px; }
+      .plan-copy { padding: 19px 21px; }
+      .plan-copy h3 { font-size: 26px; }
+      .summary-photo { height: 155px; }
+    }
+
+    @media (max-width: 390px) {
+      .shell { padding-inline: 17px; }
+      .pick-grid { grid-template-columns: 1fr; }
+      .pick { display: grid; grid-template-columns: 105px 1fr; align-items: center; }
+      .pick-photo { height: 82px; aspect-ratio: auto; }
+      .pick-copy { min-height: 0; padding: 10px 12px; }
+      .pick-title { font-size: 17px; }
+      .pick-detail { font-size: 10px; }
+      .story-controls { gap: 8px; }
+      .button { padding-inline: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">♥</span><span>Our little story</span></div>
+      <div class="top-actions">
+        <button class="music-toggle" id="musicToggle" type="button" aria-pressed="false" aria-label="Play background music" title="Play background music">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <span id="musicToggleLabel">Music off</span>
+        </button>
+        <span class="top-date">February 14</span>
+      </div>
+    </header>
+    <audio id="loveSong" src="./green-day-last-night-on-earth_1DJqe6Rd.mp3" preload="none" loop></audio>
+
+    <div class="content">
+      <section class="proposal" id="proposal" aria-labelledby="question">
+        <p class="eyebrow">A very important question</p>
+        <h1 id="question">Will you be my <em>valentine?</em></h1>
+        <p class="lede">I made you a tiny little adventure. There may be snacks, excellent company, and an unreasonable number of hearts.</p>
+        <figure class="proposal-photo">
+          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1000&q=85" alt="A soft pink bouquet in the sunshine">
+          <figcaption class="photo-caption">a little something for you</figcaption>
+        </figure>
+        <div class="answer-row" id="answerRow">
+          <button class="button primary" id="yesButton" type="button">
+            Yes, absolutely <span aria-hidden="true">♥</span>
+          </button>
+          <button class="button no-button" id="noButton" type="button">No</button>
+        </div>
+        <p class="tiny-hint" id="questionHint" aria-live="polite">Choose wisely, cutie.</p>
+      </section>
+
+      <section class="story-view" id="storyView" aria-live="polite" hidden>
+        <div class="progress-wrap" aria-label="Date planning progress">
+          <div class="progress-meta"><span id="stepLabel">The fun part</span><span id="stepCount">1 of 5</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div id="stageContent"></div>
+        <div class="story-controls" id="storyControls"></div>
+      </section>
+    </div>
+
+    <footer class="bottomline">
+      <span>Made with a whole lot of love</span>
+      <span class="bottom-heart" aria-hidden="true">♥</span>
+      <span>Just for you</span>
+    </footer>
+  </main>
+
+  <script>
+    const proposal = document.querySelector('#proposal');
+    const storyView = document.querySelector('#storyView');
+    const stageContent = document.querySelector('#stageContent');
+    const storyControls = document.querySelector('#storyControls');
+    const progressFill = document.querySelector('#progressFill');
+    const stepLabel = document.querySelector('#stepLabel');
+    const stepCount = document.querySelector('#stepCount');
+    const answerRow = document.querySelector('#answerRow');
+    const noButton = document.querySelector('#noButton');
+    const questionHint = document.querySelector('#questionHint');
+    const loveSong = document.querySelector('#loveSong');
+    const musicToggle = document.querySelector('#musicToggle');
+    const musicToggleLabel = document.querySelector('#musicToggleLabel');
+
+    const photo = (id, width = 1000) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=82`;
+    const activities = [
+      { value: 'picnic', title: 'Sunset picnic', detail: 'A blanket, a view, and us.', image: 'photo-1470252649378-9c29740c9fa8', alt: 'Golden sunset over a quiet landscape' },
+      { value: 'movie', title: 'Cozy movie night', detail: 'Blankets, snacks, no plans.', image: 'photo-1517604931442-7e0c8ed2963c', alt: 'A warmly lit movie theater' },
+      { value: 'flowers', title: 'Flower market date', detail: 'Pick a little joy together.', image: 'photo-1490750967868-88aa4486c946', alt: 'A colorful bunch of flowers' }
+    ];
+    const foods = [
+      { value: 'pasta', title: 'Twirl-worthy pasta', detail: 'Extra parmesan, obviously.', image: 'photo-1551183053-bf91a1d81141', alt: 'A plate of fresh pasta' },
+      { value: 'pizza', title: 'Heart-shaped pizza', detail: 'One slice? Not a chance.', image: 'photo-1513104890138-7c749659a591', alt: 'A fresh pizza with colorful toppings' },
+      { value: 'sushi', title: 'A sushi date', detail: 'A little bit fancy, a lot delicious.', image: 'photo-1579871494447-9811cf80d66c', alt: 'A platter of colorful sushi rolls' }
+    ];
+    const desserts = [
+      { value: 'cake', title: 'Chocolate cake', detail: 'The very good kind of rich.', image: 'photo-1578985545062-69928b1d9587', alt: 'A decorated chocolate celebration cake' },
+      { value: 'icecream', title: 'Ice cream for two', detail: 'Two spoons, one bowl.', image: 'photo-1563805042-7684c019e1cb', alt: 'Scoops of ice cream in a bowl' },
+      { value: 'strawberries', title: 'Chocolate strawberries', detail: 'A tiny bit fancy, very sweet.', image: 'photo-1481391319762-47dff72954d9', alt: 'Chocolate treats arranged for sharing' }
+    ];
+
+    const state = { stage: 0, activity: null, food: null, dessert: null };
+    const stages = ['Pick our adventure', 'A little date plan', 'Something delicious', 'Save room for this', 'One last thing'];
+
+    function choiceCards(items, category, selected) {
+      return `<div class="pick-grid">${items.map(item => `
+        <button class="pick" type="button" data-category="${category}" data-value="${item.value}" aria-pressed="${selected === item.value}">
+          <img class="pick-photo" src="${photo(item.image, 640)}" alt="${item.alt}" loading="lazy">
+          <span class="pick-copy"><span class="pick-title">${item.title}</span><span class="pick-detail">${item.detail}</span></span>
+        </button>`).join('')}
+      </div>`;
+    }
+
+    function renderStage() {
+      const index = state.stage;
+      stepLabel.textContent = stages[index];
+      stepCount.textContent = `${index + 1} of ${stages.length}`;
+      progressFill.style.width = `${((index + 1) / stages.length) * 100}%`;
+
+      if (index === 0) {
+        stageContent.innerHTML = `
+          <p class="eyebrow">First things first</p>
+          <h2>What's our kind of <em>fun?</em></h2>
+          <p class="story-lede">Pick the little adventure that sounds most like us.</p>
+          ${choiceCards(activities, 'activity', state.activity)}`;
+      } else if (index === 1) {
+        const plans = {
+          picnic: ['A golden-hour picnic', 'We find a pretty spot just before sunset, bring the coziest blanket, and stay until the sky puts on a show.', 'Meet me when the sky turns pink'],
+          movie: ['A blanket-fort premiere', 'We pick a favorite film, make a truly irresponsible snack pile, and get impossibly cozy.', 'Showtime is whenever we say'],
+          flowers: ['A tiny flower-market mission', 'We wander through the blooms, pick each other a favorite, then bring our little bouquet home.', 'Meet me somewhere in full bloom']
+        };
+        const plan = plans[state.activity];
+        const planImage = state.activity === 'picnic' ? activities[0] : state.activity === 'movie' ? activities[1] : activities[2];
+        stageContent.innerHTML = `
+          <p class="eyebrow">It's a date</p>
+          <h2>I have a little <em>plan.</em></h2>
+          <p class="story-lede">Just add your favorite person (that's you).</p>
+          <div class="date-plan">
+            <img class="plan-photo" src="${photo(planImage.image, 900)}" alt="${planImage.alt}">
+            <div class="plan-copy"><p class="plan-kicker">Our date idea</p><h3>${plan[0]}</h3><p>${plan[1]}</p><div class="plan-time">${plan[2]}</div></div>
+          </div>`;
+      } else if (index === 2) {
+        stageContent.innerHTML = `
+          <p class="eyebrow">Important logistical question</p>
+          <h2>What sounds <em>delicious?</em></h2>
+          <p class="story-lede">I promise to share at least one bite.</p>
+          ${choiceCards(foods, 'food', state.food)}`;
+      } else if (index === 3) {
+        stageContent.innerHTML = `
+          <p class="eyebrow">There is always room</p>
+          <h2>Let's make it <em>sweeter.</em></h2>
+          <p class="story-lede">The dessert menu has one very cute date on it: you and me.</p>
+          ${choiceCards(desserts, 'dessert', state.dessert)}`;
+      } else {
+        const chosenActivity = activities.find(item => item.value === state.activity);
+        const chosenFood = foods.find(item => item.value === state.food);
+        const chosenDessert = desserts.find(item => item.value === state.dessert);
+        stageContent.innerHTML = `
+          <p class="eyebrow">My favorite plan is you</p>
+          <h2>Happy Valentine's Day, <em>love.</em></h2>
+          <p class="story-lede">Thanks for making the ordinary days feel like my favorite ones.</p>
+          <img class="summary-photo" src="${photo('photo-1518199266791-5375a83190b7', 1000)}" alt="A romantic moment shared between two people">
+          <p class="summary-line">Our date: <strong>${chosenActivity.title}</strong>, <strong>${chosenFood.title}</strong>, and <strong>${chosenDessert.title}</strong>.</p>
+          <p class="summary-line">I love doing life with you. Today, tomorrow, and all the little days in between.</p>
+          <p class="summary-line">Our little love song is waiting in the corner whenever you want it.</p>`;
+      }
+
+      const back = index === 0 ? '' : '<button class="button button-quiet button-small" type="button" data-back>Back</button>';
+      const isFinal = index === stages.length - 1;
+      const nextLabel = isFinal ? 'Start our story again' : index === 0 ? 'Plan our date' : index === 3 ? 'See our little surprise' : 'Next';
+      const next = `<button class="button primary button-small" type="button" data-next ${!canContinue() ? 'disabled aria-disabled="true"' : ''}>${nextLabel}<span aria-hidden="true">${isFinal ? '↻' : '→'}</span></button>`;
+      storyControls.innerHTML = `${back}${next}`;
+      const nextButton = storyControls.querySelector('[data-next]');
+      if (!canContinue() && !isFinal) {
+        nextButton.disabled = true;
+        nextButton.style.opacity = '.48';
+        nextButton.style.cursor = 'not-allowed';
+      }
+    }
+
+    function canContinue() {
+      if (state.stage === 0) return Boolean(state.activity);
+      if (state.stage === 2) return Boolean(state.food);
+      if (state.stage === 3) return Boolean(state.dessert);
+      return true;
+    }
+
+    function beginStory() {
+      proposal.hidden = true;
+      storyView.hidden = false;
+      state.stage = 0;
+      renderStage();
+      burstHearts(window.innerWidth / 2, window.innerHeight * .47, 16);
+      void playMusic();
+    }
+
+    function choose(category, value) {
+      state[category] = value;
+      const stageContentTop = stageContent.getBoundingClientRect().top + window.scrollY;
+      renderStage();
+      if (window.innerWidth < 650) window.scrollTo({ top: Math.max(0, stageContentTop - 65), behavior: 'smooth' });
+    }
+
+    function burstHearts(x, y, count = 10) {
+      const colors = ['#852f42', '#bf5969', '#df9da3', '#d9ac75'];
+      for (let index = 0; index < count; index += 1) {
+        const heart = document.createElement('span');
+        heart.className = 'floating-heart';
+        heart.textContent = index % 3 === 0 ? '♥' : '♡';
+        heart.style.setProperty('--sx', `${x + (Math.random() - .5) * 75}px`);
+        heart.style.setProperty('--sy', `${y + (Math.random() - .5) * 28}px`);
+        heart.style.setProperty('--drift', `${(Math.random() - .5) * 105}px`);
+        heart.style.setProperty('--turn', `${(Math.random() - .5) * 65}deg`);
+        heart.style.setProperty('--hs', `${14 + Math.random() * 17}px`);
+        heart.style.setProperty('--hc', colors[index % colors.length]);
+        document.body.append(heart);
+        heart.addEventListener('animationend', () => heart.remove(), { once: true });
+      }
+    }
+
+    function celebrate() {
+      const colors = ['#852f42', '#bf5969', '#df9da3', '#d9ac75', '#e9c9a8'];
+      for (let index = 0; index < 54; index += 1) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti';
+        piece.style.setProperty('--x', `${Math.random() * 100}vw`);
+        piece.style.setProperty('--c', colors[index % colors.length]);
+        piece.style.setProperty('--dur', `${2.5 + Math.random() * 2.5}s`);
+        document.body.append(piece);
+        piece.addEventListener('animationend', () => piece.remove(), { once: true });
+      }
+    }
+
+    async function playMusic() {
+      try {
+        await loveSong.play();
+      } catch {
+        musicToggleLabel.textContent = 'Try music';
+        musicToggle.setAttribute('aria-label', 'Try playing background music');
+        musicToggle.title = 'Tap to try playing the song';
+      }
+    }
+
+    musicToggle.addEventListener('click', () => {
+      if (loveSong.paused) void playMusic();
+      else loveSong.pause();
+    });
+    loveSong.addEventListener('play', () => {
+      musicToggleLabel.textContent = 'Music on';
+      musicToggle.setAttribute('aria-pressed', 'true');
+      musicToggle.setAttribute('aria-label', 'Pause background music');
+      musicToggle.title = 'Pause background music';
+    });
+    loveSong.addEventListener('pause', () => {
+      musicToggleLabel.textContent = 'Music off';
+      musicToggle.setAttribute('aria-pressed', 'false');
+      musicToggle.setAttribute('aria-label', 'Play background music');
+      musicToggle.title = 'Play background music';
+    });
+    loveSong.addEventListener('error', () => {
+      musicToggleLabel.textContent = 'Song unavailable';
+      musicToggle.setAttribute('aria-label', 'Background song unavailable');
+      musicToggle.title = 'Keep the MP3 beside index.html';
+    });
+
+    function dodgeNo() {
+      if (noButton.dataset.moved !== 'true') {
+        const row = answerRow.getBoundingClientRect();
+        const button = noButton.getBoundingClientRect();
+        noButton.style.position = 'absolute';
+        noButton.style.left = `${Math.max(0, Math.random() * Math.max(1, row.width - button.width))}px`;
+        noButton.style.top = `${Math.random() * 16}px`;
+        noButton.dataset.moved = 'true';
+      } else {
+        const row = answerRow.getBoundingClientRect();
+        const button = noButton.getBoundingClientRect();
+        noButton.style.left = `${Math.max(0, Math.random() * Math.max(1, row.width - button.width))}px`;
+        noButton.style.top = `${Math.random() * 16}px`;
+      }
+      questionHint.textContent = ['Oop, almost!', 'That button is feeling shy.', 'The Yes button is right there, darling.'][Math.floor(Math.random() * 3)];
+    }
+
+    document.querySelector('#yesButton').addEventListener('click', beginStory);
+    noButton.addEventListener('pointerenter', dodgeNo);
+    noButton.addEventListener('focus', dodgeNo);
+    noButton.addEventListener('click', () => {
+      questionHint.textContent = 'I admire the commitment. I still saved you the Yes button. ♥';
+      noButton.textContent = 'Still no?';
+      dodgeNo();
+    });
+
+    storyView.addEventListener('click', event => {
+      const choice = event.target.closest('[data-category]');
+      if (choice) {
+        choose(choice.dataset.category, choice.dataset.value);
+        return;
+      }
+      if (event.target.closest('[data-back]')) {
+        state.stage = Math.max(0, state.stage - 1);
+        renderStage();
+        return;
+      }
+      if (event.target.closest('[data-next]')) {
+        if (state.stage === stages.length - 1) {
+          state.activity = null;
+          state.food = null;
+          state.dessert = null;
+          state.stage = 0;
+          proposal.hidden = false;
+          storyView.hidden = true;
+          noButton.textContent = 'No';
+          noButton.style.cssText = '';
+          delete noButton.dataset.moved;
+          questionHint.textContent = 'Choose wisely, cutie.';
+          return;
+        }
+        if (!canContinue()) return;
+        state.stage += 1;
+        renderStage();
+        if (state.stage === stages.length - 1) celebrate();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  </script>
+</body>
+</html>
